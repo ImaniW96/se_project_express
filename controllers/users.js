@@ -1,4 +1,5 @@
 const User = require("../models/user");
+const { BAD_REQUEST, DEFAULT, OKAY_REQUEST, CREATE_REQUEST } = require("../utils/errors");
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(200).send(users))
@@ -21,7 +22,7 @@ const getUser =(req, res)=>{
       if (err.name === 'DocumentNotFoundError'){
         return res.status(404).send({ message: err.message });
       }
-      return res.status(500).send({ message: err.message });
+      return res.status(DEFAULT).send({ message: err.message });
   })
 
 }
@@ -32,9 +33,9 @@ const createUser = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
-        return res.status(400).send({ message: err.message });
+        return res.status(BAD_REQUEST).send({ message: err.message });
       }
-      return res.status(500).send({ message: err.message });
+      return res.status(DEFAULT).send({ message: err.message });
     });
 };
-module.exports = { getUsers, createUser, getUser };
+module.exports = { getUsers, createUser, getUser, BAD_REQUEST,DEFAULT, OKAY_REQUEST, CREATE_REQUEST };
