@@ -6,4 +6,4 @@ router.get("/:userId", getUser);
 router.post("/", createUser);
 module.exports = router;
 
-//baseUrl/users/192312379
+ 

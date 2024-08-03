@@ -4,28 +4,7 @@ const { findById } = require("../models/user");
 const { NOT_FOUND, OKAY_REQUEST, CREATE_REQUEST } = require("../utils/errors");
 const { BAD_REQUEST, DEFAULT } = require("./users");
 
-// const createItem = (req, res) => {
-//   const { name, weather, imageUrl } = req.body;
-//   ClothingItem.create({
-//     name,
-//     weather,
-//     imageUrl,
-//     owner: req.user._id
-//   })
-//    .then((item) => {
-//       return res.status(201).send(item);
-//     })
-//     .catch((e) => {
-//         console.log(e.name)
-//         if (!name || name.length < 2) {
-//             return res.status(400).send({ message: "The 'name' field must be at least 2 characters long." });
-//           }
-    
-          
-//       return res.status(500).send({ message: "Error from createItem", e });
-      
-//     });
-// };
+ 
 const createItem = (req, res) => {
     const { name, weather, imageUrl } = req.body;
     if (!name || name.length < 2) {
@@ -61,25 +40,7 @@ const getItems = (req, res) => {
     });
 };
 
-// const deleteItem = (req, res) => {
-//   const { itemId } = req.params;
-//   ClothingItem.findByIdAndRemove(itemId)
-//     .orFail()
-//     .then((item) => {
-//       return res.status(200).send({ message: "Item has been deleted" });
-//     })
-//     .catch((err) => {
-//       console.error(err);
-//       if (err.name === "CastError") {
-//         // send a 400 respose
-
-//       }if else(
-//          (err.name === "DocumentNotFoundError") {
-//             //// send the 404 error
-//             }
-//       )
-//     });
-// };
+ 
 const deleteItem = (req, res) => {
     const { itemId } = req.params;
     ClothingItem.findByIdAndRemove(itemId)
@@ -111,7 +72,7 @@ const likeItem = (req, res) => {
         return res.status(OKAY_REQUEST).send({ message: "Item has been deleted" });
       })
       .catch((err) => {
-        if (err.name == 'CastError'){
+        if (err.name === 'CastError'){
             return res.status(BAD_REQUEST).send({message: err.message})
         } else if (err.name ==='DocumentNotFoundError'){
           return res.status(NOT_FOUND).send({message:err.message});
@@ -131,7 +92,7 @@ const likeItem = (req, res) => {
         return res.status(OKAY_REQUEST).send({ message: "Item has been deleted" });
       })
       .catch((err) => {
-        if (err.name == 'CastError'){
+        if (err.name === 'CastError'){
             return res.status(BAD_REQUEST).send({message: err.message})
         } else if (err.name ==='DocumentNotFoundError'){
           return res.status(NOT_FOUND).send({message:err.message});
