@@ -1,7 +1,7 @@
 const clothingItem = require("../models/clothingItem");
 const ClothingItem = require("../models/clothingItem");
 const { findById } = require("../models/user");
-const { NOT_FOUND } = require("../utils/errors");
+const { NOT_FOUND, OKAY_REQUEST, CREATE_REQUEST } = require("../utils/errors");
 const { BAD_REQUEST, DEFAULT } = require("./users");
 
 // const createItem = (req, res) => {
@@ -29,7 +29,7 @@ const { BAD_REQUEST, DEFAULT } = require("./users");
 const createItem = (req, res) => {
     const { name, weather, imageUrl } = req.body;
     if (!name || name.length < 2) {
-      return res.status(400).send({ message: "The 'name' field must be at least 2 characters long." });
+      return res.status(BAD_REQUEST).send({ message: "The 'name' field must be at least 2 characters long." });
     }
     ClothingItem.create({
       name,
@@ -38,26 +38,26 @@ const createItem = (req, res) => {
       owner: req.user._id
     })
       .then((item) => {
-        return res.status(201).send(item);
+        return res.status(CREATE_REQUEST).send(item);
       })
       .catch((e) => {
         console.error(e.name);  
         if (e.name === "ValidationError") {
-          return res.status(400).send({ message: "Validation error: " });
+          return res.status(BAD_REQUEST).send({ message: "Validation error: " });
         } else if (e.name === "MongoError" && e.code === 11000) {
-          return res.status(404).send({ message: "Duplicate key error: " });
+          return res.status(NOT_FOUND).send({ message: "Duplicate key error: " });
         } else {
          
-          return res.status(500).send({ message: "Internal Server Error: "});
+          return res.status(DEFAULT).send({ message: "Internal Server Error: "});
         }
       });
   };
 
 const getItems = (req, res) => {
   ClothingItem.find({})
-    .then((items) => res.status(200).send(items))
+    .then((items) => res.status(OKAY_REQUEST).send(items))
     .catch((e) => {
-      res.status(500).send({ message: "Error can not getItems" });
+      res.status(DEFAULT).send({ message: "Error can not getItems" });
     });
 };
 
@@ -85,16 +85,16 @@ const deleteItem = (req, res) => {
     ClothingItem.findByIdAndRemove(itemId)
       .orFail()
       .then((item) => {
-        return res.status(200).send({ message: "Item has been deleted" });
+        return res.status(OKAY_REQUEST).send({ message: "Item has been deleted" });
       })
       .catch((err) => {
         console.error(err);
         if (err.name === "CastError") {
-          return res.status(400).send({ message: "Invalid item ID" });
+          return res.status(BAD_REQUEST).send({ message: "Invalid item ID" });
         } else if (err.name === "DocumentNotFoundError") {
-          return res.status(404).send({ message: "Item not found" });
+          return res.status(NOT_FOUND).send({ message: "Item not found" });
         } else {
-          return res.status(500).send({ message: "An unexpected error occurred" });
+          return res.status(DEFAULT).send({ message: "An unexpected error occurred" });
         }
       });
   };
@@ -102,18 +102,18 @@ const deleteItem = (req, res) => {
 
 const likeItem = (req, res) => {
     const { itemId } = req.params;
-    ClothingItem.findByByIdAndUpdate(itemId, {
-        $addToSet: { likes:userId } },
+    ClothingItem.findByIdAndUpdate(itemId, {
+        $addToSet: { likes:req.user._id } },
         {new:true},
     )
       .orFail()
       .then((item) => {
-        return res.status(200).send({ message: "Item has been deleted" });
+        return res.status(OKAY_REQUEST).send({ message: "Item has been deleted" });
       })
       .catch((err) => {
         if (err.name == 'CastError'){
             return res.status(BAD_REQUEST).send({message: err.message})
-        } else if (err.name ==='DOCUMENTNOTFOUND'){
+        } else if (err.name ==='DocumentNotFoundError'){
           return res.status(NOT_FOUND).send({message:err.message});
         }
         return res.status(DEFAULT).send({message:err.message});
@@ -122,18 +122,18 @@ const likeItem = (req, res) => {
 
   const deleteLike = (req, res) => {
     const { itemId } = req.params;
-    ClothingItem.findByByIdAndUpdate(itemId, {
-        $pull: { likes:userId } },
+    ClothingItem.findByIdAndUpdate(itemId, {
+        $pull: { likes:req.user._id } },
         {new:true},
     )
       .orFail()
       .then((item) => {
-        return res.status(200).send({ message: "Item has been deleted" });
+        return res.status(OKAY_REQUEST).send({ message: "Item has been deleted" });
       })
       .catch((err) => {
         if (err.name == 'CastError'){
             return res.status(BAD_REQUEST).send({message: err.message})
-        } else if (err.name ==='DOCUMENTNOTFOUND'){
+        } else if (err.name ==='DocumentNotFoundError'){
           return res.status(NOT_FOUND).send({message:err.message});
         }
         return res.status(DEFAULT).send({message:err.message});
