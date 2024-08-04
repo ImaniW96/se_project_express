@@ -1,5 +1,6 @@
 const User = require("../models/user");
 const { BAD_REQUEST, DEFAULT, OKAY_REQUEST, CREATE_REQUEST, NOT_FOUND } = require("../utils/errors");
+
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.status(OKAY_REQUEST).send(users))
@@ -12,9 +13,7 @@ const getUser =(req, res)=>{
   const {userId} = req.params;
   console.log(userId)
 
-  User.findById(userId).orFail().then((user)=>{
-    return res.status(OKAY_REQUEST).send(user);
-  }).catch((err)=>{
+  User.findById(userId).orFail().then((user)=>res.status(OKAY_REQUEST).send(user)).catch((err)=>{
     console.error(err);
       if (err.name === "ValidationError" || err.name === 'CastError') {
         return res.status(BAD_REQUEST).send({ message: err.message });

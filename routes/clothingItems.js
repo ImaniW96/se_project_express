@@ -1,9 +1,5 @@
-const mongoose = require("mongoose");
-const router = require("express").Router();
- const express = require("express")
- const {PORT = 3001} = process.env;
- const app = express();
 
+const router = require("express").Router();
 const {getItems, createItem, deleteItem, likeItem, deleteLike} = require("../controllers/clothingItem")
 
 // the /items routes
