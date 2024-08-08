@@ -42,7 +42,25 @@ const user = require('./user')
         type: Date,
         default: Date.now
 
+    },
+    email:{
+    type:String,
+    required: true,
+    unique:true,
+    validate:{
+        validator(input){
+            return validator.isEmail(input)
+        },
+        message: 'Enter a valid Email'
     }
+    },
+    password:{
+        type:String,
+        required: true,
+        minlength: 8,
+
+    }
+    
  });
  
 

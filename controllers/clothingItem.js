@@ -90,6 +90,15 @@ const likeItem = (req, res) => {
         }
         return res.status(DEFAULT).send({message:err.message});
       });
+      const userSchema = new Schema({
+       
+        password: {
+          type: String,
+          required: true,
+          select: false
+        },
+       
+      })
   };
 
 

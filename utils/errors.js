@@ -5,3 +5,8 @@ module.exports = {
     OKAY_REQUEST: 200,
     CREATE_REQUEST: 201,
   };
+
+  const ERROR_MESSAGES ={
+    BAD_REQUEST,
+    NOT_FOUND
+  }

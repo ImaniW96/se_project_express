@@ -26,7 +26,8 @@ const getUser =(req, res)=>{
 
 }
 const createUser = (req, res) => {
-  const { name, avatar } = req.body;
+  
+  const { name, avatar, email, password } = req.body;
   User.create({ name, avatar })
     .then((user) => res.status(201).send(user))
     .catch((err) => {
@@ -36,5 +37,23 @@ const createUser = (req, res) => {
       }
       return res.status(DEFAULT).send({ message: err.message });
     });
+    
 };
+
+// User.findOne({ email }).select('+password')
+//   .then((user) => {
+//    if(user){
+//     return res.status(HTTP_USER_DUPLICATED).send({message:'Duplicate error'})
+//    }
+//    return bcrypt.hash(password, 10);
+//   }).then((hash)=>{
+//     User.create({
+//       name,
+//       avatar,
+//       password:hash,
+//     });
+//   })
+ const signUp =(req,res)=>{
+
+ }
 module.exports = { getUsers, createUser, getUser, BAD_REQUEST,DEFAULT, OKAY_REQUEST, CREATE_REQUEST, NOT_FOUND };
