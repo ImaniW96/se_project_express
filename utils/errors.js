@@ -4,9 +4,7 @@ module.exports = {
     DEFAULT: 500,
     OKAY_REQUEST: 200,
     CREATE_REQUEST: 201,
+    DUPLICATE_ERROR:409
   };
 
-  const ERROR_MESSAGES ={
-    BAD_REQUEST,
-    NOT_FOUND
-  }
+ 

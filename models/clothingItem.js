@@ -29,7 +29,8 @@ const user = require('./user')
     },
     owner:{
         type:mongoose.Schema.Types.ObjectId,
-        ref:user
+        ref:user,
+        required: true
         
     }, 
     likes:{
@@ -43,23 +44,7 @@ const user = require('./user')
         default: Date.now
 
     },
-    email:{
-    type:String,
-    required: true,
-    unique:true,
-    validate:{
-        validator(input){
-            return validator.isEmail(input)
-        },
-        message: 'Enter a valid Email'
-    }
-    },
-    password:{
-        type:String,
-        required: true,
-        minlength: 8,
-
-    }
+     
     
  });
  

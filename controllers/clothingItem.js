@@ -1,109 +1,118 @@
- 
 const ClothingItem = require("../models/clothingItem");
 const { NOT_FOUND, OKAY_REQUEST, CREATE_REQUEST } = require("../utils/errors");
 const { BAD_REQUEST, DEFAULT } = require("./users");
 
- 
 const createItem = (req, res) => {
-    const { name, weather, imageUrl } = req.body;
-    if (!name || name.length < 2) {
-      return res.status(BAD_REQUEST).send({ message: "The 'name' field must be at least 2 characters long." });
-    }
-    return ClothingItem.create({
-      name,
-      weather,
-      imageUrl,
-      owner: req.user._id
-    })
-      .then((item) => res.status(CREATE_REQUEST).send(item))
-      .catch((e) => {
-        console.error(e.name);  
-        if (e.name === "ValidationError") {
-          return res.status(BAD_REQUEST).send({ message: "Validation error: " });
-        } 
-        if (e.name === "MongoError" && e.code === 11000) {
-          return res.status(NOT_FOUND).send({ message: "Duplicate key error: " });
-        } 
-        return res.status(DEFAULT).send({ message: "Internal Server Error: "});
+  const { name, weather, imageUrl } = req.body;
+  if (!name || name.length < 2) {
+    return res
+      .status(BAD_REQUEST)
+      .send({
+        message: "The 'name' field must be at least 2 characters long.",
       });
-  };
+  }
+  return ClothingItem.create({
+    name,
+    weather,
+    imageUrl,
+    owner: req.user._id,
+  })
+    .then((item) => res.status(CREATE_REQUEST).send(item))
+    .catch((e) => {
+      console.error(e.name);
+      if (e.name === "ValidationError") {
+        return res.status(BAD_REQUEST).send({ message: "Validation error: " });
+      }
+      if (e.name === "MongoError" && e.code === 11000) {
+        return res.status(NOT_FOUND).send({ message: "Duplicate key error: " });
+      }
+      return res.status(DEFAULT).send({ message: "Internal Server Error: " });
+    });
+};
 
 const getItems = (req, res) => {
   ClothingItem.find({})
     .then((items) => res.status(OKAY_REQUEST).send(items))
     .catch((e) => {
-        console.error(e)
+      console.error(e);
       res.status(DEFAULT).send({ message: "Error can not getItems" });
     });
 };
 
- 
 const deleteItem = (req, res) => {
-    const { itemId } = req.params;
-    ClothingItem.findByIdAndRemove(itemId)
-      .orFail()
-      .then(() => res.status(OKAY_REQUEST).send({ message: "Item has been deleted" }))
-      .catch((err) => {
-        console.error(err);
-        if (err.name === "CastError") {
-          return res.status(BAD_REQUEST).send({ message: "Invalid item ID" });
-        } if (err.name === "DocumentNotFoundError") {
-          return res.status(NOT_FOUND).send({ message: "Item not found" });
-        } 
-          return res.status(DEFAULT).send({ message: "An unexpected error occurred" });
-        
-      });
-  };
-
+  const { itemId } = req.params;
+  ClothingItem.findByIdAndRemove(itemId)
+    .orFail()
+    .then(() =>
+      res.status(OKAY_REQUEST).send({ message: "Item has been deleted" })
+    )
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "CastError") {
+        return res.status(BAD_REQUEST).send({ message: "Invalid item ID" });
+      }
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(NOT_FOUND).send({ message: "Item not found" });
+      }
+      return res
+        .status(DEFAULT)
+        .send({ message: "An unexpected error occurred" });
+    });
+};
 
 const likeItem = (req, res) => {
-    const { itemId } = req.params;
-    ClothingItem.findByIdAndUpdate(itemId, {
-        $addToSet: { likes:req.user._id } },
-        {new:true},
-    )
-      .orFail()
-      .then((item) => res.status(OKAY_REQUEST).send(item))
-      .catch((err) => {
-        if (err.name === 'CastError'){
-            return res.status(BAD_REQUEST).send({message: err.message})
-        } if (err.name ==='DocumentNotFoundError'){
-          return res.status(NOT_FOUND).send({message:err.message});
-        }
-        return res.status(DEFAULT).send({message:err.message});
-      });
-  };
+  const { itemId } = req.params;
+  ClothingItem.findByIdAndUpdate(
+    itemId,
+    {
+      $addToSet: { likes: req.user._id },
+    },
+    { new: true }
+  )
+    .orFail()
+    .then((item) => res.status(OKAY_REQUEST).send(item))
+    .catch((err) => {
+      if (err.name === "CastError") {
+        return res.status(BAD_REQUEST).send({ message: err.message });
+      }
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(NOT_FOUND).send({ message: err.message });
+      }
+      return res.status(DEFAULT).send({ message: err.message });
+    });
+};
 
-  const deleteLike = (req, res) => {
-    const { itemId } = req.params;
-    ClothingItem.findByIdAndUpdate(itemId, {
-        $pull: { likes:req.user._id } },
-        {new:true},
-    )
-      .orFail()
-      .then((item) => res.status(OKAY_REQUEST).send(item))
-      .catch((err) => {
-        if (err.name === 'CastError'){
-            return res.status(BAD_REQUEST).send({message: err.message})
-        } if (err.name ==='DocumentNotFoundError'){
-          return res.status(NOT_FOUND).send({message:err.message});
-        }
-        return res.status(DEFAULT).send({message:err.message});
-      });
-      const userSchema = new Schema({
-       
-        password: {
-          type: String,
-          required: true,
-          select: false
-        },
-       
-      })
-  };
+const deleteLike = (req, res) => {
+  const { itemId } = req.params;
+  ClothingItem.findByIdAndUpdate(
+    itemId,
+    {
+      $pull: { likes: req.user._id },
+    },
+    { new: true }
+  )
+    .orFail()
+    .then((item) => res.status(OKAY_REQUEST).send(item))
+    .catch((err) => {
+      if (err.name === "CastError") {
+        return res.status(BAD_REQUEST).send({ message: err.message });
+      }
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(NOT_FOUND).send({ message: err.message });
+      }
+      return res.status(DEFAULT).send({ message: err.message });
+    });
+  //   const userSchema = new Schema({
 
+  //     password: {
+  //       type: String,
+  //       required: true,
+  //       select: false
+  //     },
 
- 
- 
+  //   })
+};
+
 // const mongoose = require("mongoose");
 
 // const clothingItemSchema = new mongoose.Schema({});
