@@ -1,5 +1,6 @@
 const User = require("../models/user");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 const {
   BAD_REQUEST,
   DEFAULT,
@@ -7,17 +8,18 @@ const {
   CREATE_REQUEST,
   NOT_FOUND,
   DUPLICATE_ERROR,
+  NOT_AUTHORIZED,
 } = require("../utils/errors");
 const JWT_SECRET = "some secret key";
 
-const getUsers = (req, res) => {
-  User.find({})
-    .then((users) => res.status(OKAY_REQUEST).send(users))
-    .catch((err) => {
-      console.error(err);
-      return res.status(DEFAULT).send({ message: err.message });
-    });
-};
+// const getUsers = (req, res) => {
+//   User.find({})
+//     .then((users) => res.status(OKAY_REQUEST).send(users))
+//     .catch((err) => {
+//       console.error(err);
+//       return res.status(DEFAULT).send({ message: err.message });
+//     });
+// };
 
 // This can become getCurrentUser
 // instead of getting ID from params
@@ -42,16 +44,18 @@ const getCurrentUser = (req, res) => {
 };
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
+  // do check for name, avatar, email, password
 
   // check the database for the email. If it already exists, throw an error.
-  User.findOne({ email })
-    .select("+password")
-    .then((user) => {
-      if (user) {
-        return res.status(DUPLICATE_ERROR).send({ message: "Duplicate error" });
-      }
-      return bcrypt.hash(password, 10);
-    })
+  // User.findOne({ email })
+
+  //   .then((user) => {
+  //     if (user) {
+  //       res.status(DUPLICATE_ERROR).send({ message: "Duplicate error" });
+  //       throw error;
+  //     }
+  bcrypt
+    .hash(password, 10)
     .then((hash) => {
       return User.create({
         name,
@@ -60,13 +64,13 @@ const createUser = (req, res) => {
         password: hash,
       });
     })
-    .then((user) =>
-      res.status(201).send({
+    .then((user) => {
+      return res.status(201).send({
         name: user.name,
         avatar: user.avatar,
         email: user.email,
-      })
-    )
+      });
+    })
     .catch((err) => {
       if (err.code === 11000) {
         return res.status(DUPLICATE_ERROR).send({ message: "Duplicate error" });
@@ -76,35 +80,33 @@ const createUser = (req, res) => {
       }
       return res.status(DEFAULT).send({ message: "An error has occured" });
     });
-
-  // const { name, avatar, email, password } = req.body;
-  User.create({ name, avatar })
-    .then((user) => res.status(201).send(user))
-    .catch((err) => {
-      console.error(err);
-      if (err.name === "ValidationError") {
-        return res.status(BAD_REQUEST).send({ message: err.message });
-      }
-      return res.status(DEFAULT).send({ message: err.message });
-    });
 };
 const logIn = (req, res) => {
   const { email, password } = req.body;
+
+  if (!email || !password) {
+    return res
+      .status(BAD_REQUEST)
+      .send({ message: "email and password are required" });
+  }
+
   User.findOne({ email })
     .then((user) => {
+      console.log(">>>", user);
       if (!user) {
         return res
-          .status(401)
+          .status(NOT_AUTHORIZED)
           .send({ message: "Please enter a valid email or password" });
       }
       // if (!user.id || !JWT_SECRET){
       //   return res.status(DEFAULT).send({message:"Internal server error"})
       // }
 
-      const token = jwt.sign({ _id: user.id }, JWT_SECRET, {
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: "7d",
       });
-      return res.status(200).send({
+
+      return res.status(OKAY_REQUEST).send({
         token,
         name: user.name,
         email: user.email,
@@ -118,7 +120,7 @@ const logIn = (req, res) => {
 };
 
 module.exports = {
-  getUsers,
+  // getUsers,
   createUser,
   getCurrentUser,
   logIn,
