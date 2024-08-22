@@ -1,6 +1,6 @@
-const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const User = require("../models/user");
 const {
   BAD_REQUEST,
   DEFAULT,
@@ -10,6 +10,7 @@ const {
   DUPLICATE_ERROR,
   NOT_AUTHORIZED,
 } = require("../utils/errors");
+
 const JWT_SECRET = "some-secret-key";
 
 // This can become getCurrentUser
@@ -38,21 +39,21 @@ const createUser = (req, res) => {
 
   bcrypt
     .hash(password, 10)
-    .then((hash) => {
-      return User.create({
+    .then((hash) =>
+      User.create({
         name,
         avatar,
         email,
         password: hash,
-      });
-    })
-    .then((user) => {
-      return res.status(CREATE_REQUEST).send({
+      })
+    )
+    .then((user) =>
+      res.status(CREATE_REQUEST).send({
         name: user.name,
         avatar: user.avatar,
         email: user.email,
-      });
-    })
+      })
+    )
     .catch((err) => {
       if (err.code === 11000) {
         return res.status(DUPLICATE_ERROR).send({ message: "Duplicate error" });
@@ -73,34 +74,34 @@ const logIn = (req, res) => {
   }
 
   User.findOne({ email })
+    .select("+password")
     .then((user) => {
-      console.log(">>>", user);
       if (!user) {
         return res
           .status(NOT_AUTHORIZED)
           .send({ message: "Please enter a valid email or password" });
       }
-      // bcrypt.compare(password, user.password).then((isMatch) => {
-      //   if (!isMatch) {
-      //     return res.status(NOT_AUTHORIZED);
-      //   }
-      //   return user;
-      // });
-      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
-        expiresIn: "7d",
-      });
+      return bcrypt.compare(password, user.password).then((isMatch) => {
+        if (!isMatch) {
+          return res
+            .status(NOT_AUTHORIZED)
+            .send({ message: "Invalid email or password" });
+        }
 
-      return res.status(OKAY_REQUEST).send({
-        token,
-        name: user.name,
-        email: user.email,
-        avatar: user.avatar,
-        _id: user._id,
+        const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
+          expiresIn: "7d",
+        });
+
+        return res.status(OKAY_REQUEST).send({
+          token,
+          name: user.name,
+          email: user.email,
+          avatar: user.avatar,
+          _id: user._id,
+        });
       });
     })
-    .catch((err) => {
-      return res.status(DEFAULT).send({ message: "failed to log in" });
-    });
+    .catch(() => res.status(DEFAULT).send({ message: "failed to log in" }));
 };
 const updateUser = (req, res) => {
   User.findByIdAndUpdate(
@@ -148,3 +149,4 @@ module.exports = {
 //     avatar:
 //   }
 // })
+//

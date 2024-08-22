@@ -3,7 +3,7 @@ const {
   NOT_FOUND,
   OKAY_REQUEST,
   CREATE_REQUEST,
-  NOT_AUTHORIZED,
+  // NOT_AUTHORIZED,
   FORBIDDEN_ERROR,
 } = require("../utils/errors");
 const { BAD_REQUEST, DEFAULT } = require("./users");
