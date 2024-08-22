@@ -1,5 +1,6 @@
 module.exports = {
   BAD_REQUEST: 400,
+  FORBIDDEN_ERROR: 403,
   NOT_FOUND: 404,
   DEFAULT: 500,
   NOT_AUTHORIZED: 401,

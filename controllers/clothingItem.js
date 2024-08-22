@@ -4,6 +4,7 @@ const {
   OKAY_REQUEST,
   CREATE_REQUEST,
   NOT_AUTHORIZED,
+  FORBIDDEN_ERROR,
 } = require("../utils/errors");
 const { BAD_REQUEST, DEFAULT } = require("./users");
 
@@ -60,18 +61,26 @@ const getItems = (req, res) => {
 //     });
 // };
 const deleteItem = (req, res) => {
-  const { itemId } = req.parms;
+  const { itemId } = req.params;
   ClothingItem.findById(itemId)
     .orFail()
     .then((item) => {
       if (String(item.owner) !== req.user._id) {
         return res
-          .status(NOT_AUTHORIZED)
+          .status(FORBIDDEN_ERROR)
           .send({ message: "You are not authorized to delete this" });
       }
       return item.deleteOne().then(() => res.send({ message: "Item deleted" }));
     })
-    .catch((e) => itemError(req, res, e));
+    .catch((err) => {
+      if (err.name === "CastError") {
+        return res.status(BAD_REQUEST).send({ message: err.message });
+      }
+      if (err.name === "DocumentNotFoundError") {
+        return res.status(NOT_FOUND).send({ message: err.message });
+      }
+      return res.status(DEFAULT).send({ message: err.message });
+    });
 };
 const likeItem = (req, res) => {
   const { itemId } = req.params;

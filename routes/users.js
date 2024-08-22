@@ -7,6 +7,6 @@ const { getCurrentUser, updateUser } = require("../controllers/users");
 // router.post("/", createUser)
 router.use(auth);
 router.get("/me", getCurrentUser);
-router.patch("/users/me", updateUser);
+router.patch("/me", updateUser);
 
 module.exports = router;

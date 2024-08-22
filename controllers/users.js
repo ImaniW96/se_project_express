@@ -12,15 +12,6 @@ const {
 } = require("../utils/errors");
 const JWT_SECRET = "some-secret-key";
 
-// const getUsers = (req, res) => {
-//   User.find({})
-//     .then((users) => res.status(OKAY_REQUEST).send(users))
-//     .catch((err) => {
-//       console.error(err);
-//       return res.status(DEFAULT).send({ message: err.message });
-//     });
-// };
-
 // This can become getCurrentUser
 // instead of getting ID from params
 // you get from req.user
@@ -44,16 +35,7 @@ const getCurrentUser = (req, res) => {
 };
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
-  // do check for name, avatar, email, password
 
-  // check the database for the email. If it already exists, throw an error.
-  // User.findOne({ email })
-
-  //   .then((user) => {
-  //     if (user) {
-  //       res.status(DUPLICATE_ERROR).send({ message: "Duplicate error" });
-  //       throw error;
-  //     }
   bcrypt
     .hash(password, 10)
     .then((hash) => {
@@ -98,10 +80,12 @@ const logIn = (req, res) => {
           .status(NOT_AUTHORIZED)
           .send({ message: "Please enter a valid email or password" });
       }
-      // if (!user.id || !JWT_SECRET){
-      //   return res.status(DEFAULT).send({message:"Internal server error"})
-      // }
-
+      // bcrypt.compare(password, user.password).then((isMatch) => {
+      //   if (!isMatch) {
+      //     return res.status(NOT_AUTHORIZED);
+      //   }
+      //   return user;
+      // });
       const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: "7d",
       });
@@ -130,9 +114,13 @@ const updateUser = (req, res) => {
     }
   )
     .then((user) => res.send({ data: user }))
-    .catch((error) =>
-      res.send({ message: "Data validation failed or another error occured." })
-    );
+    .catch((e) => {
+      console.error(e.name);
+      if (e.name === "ValidationError") {
+        return res.status(BAD_REQUEST).send({ message: "Validation error: " });
+      }
+      return res.status(DEFAULT).send({ message: "Internal Server Error: " });
+    });
 };
 
 module.exports = {
