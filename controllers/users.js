@@ -10,7 +10,7 @@ const {
   DUPLICATE_ERROR,
   NOT_AUTHORIZED,
 } = require("../utils/errors");
-const JWT_SECRET = "some secret key";
+const JWT_SECRET = "some-secret-key";
 
 // const getUsers = (req, res) => {
 //   User.find({})
@@ -65,7 +65,7 @@ const createUser = (req, res) => {
       });
     })
     .then((user) => {
-      return res.status(201).send({
+      return res.status(CREATE_REQUEST).send({
         name: user.name,
         avatar: user.avatar,
         email: user.email,
@@ -115,8 +115,24 @@ const logIn = (req, res) => {
       });
     })
     .catch((err) => {
-      return res.status(DEFAULT).send({});
+      return res.status(DEFAULT).send({ message: "failed to log in" });
     });
+};
+const updateUser = (req, res) => {
+  User.findByIdAndUpdate(
+    req.user._id,
+    { name: req.body.name, avatar: req.body.avatar },
+
+    // pass the options object:
+    {
+      new: true, // the then handler receives the updated entry as input
+      runValidators: true, // the data will be validated before the update
+    }
+  )
+    .then((user) => res.send({ data: user }))
+    .catch((error) =>
+      res.send({ message: "Data validation failed or another error occured." })
+    );
 };
 
 module.exports = {
@@ -124,6 +140,7 @@ module.exports = {
   createUser,
   getCurrentUser,
   logIn,
+  updateUser,
   BAD_REQUEST,
   DEFAULT,
   OKAY_REQUEST,

@@ -1,15 +1,18 @@
 const ClothingItem = require("../models/clothingItem");
-const { NOT_FOUND, OKAY_REQUEST, CREATE_REQUEST } = require("../utils/errors");
+const {
+  NOT_FOUND,
+  OKAY_REQUEST,
+  CREATE_REQUEST,
+  NOT_AUTHORIZED,
+} = require("../utils/errors");
 const { BAD_REQUEST, DEFAULT } = require("./users");
 
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
   if (!name || name.length < 2) {
-    return res
-      .status(BAD_REQUEST)
-      .send({
-        message: "The 'name' field must be at least 2 characters long.",
-      });
+    return res.status(BAD_REQUEST).send({
+      message: "The 'name' field must be at least 2 characters long.",
+    });
   }
   return ClothingItem.create({
     name,
@@ -22,9 +25,6 @@ const createItem = (req, res) => {
       console.error(e.name);
       if (e.name === "ValidationError") {
         return res.status(BAD_REQUEST).send({ message: "Validation error: " });
-      }
-      if (e.name === "MongoError" && e.code === 11000) {
-        return res.status(NOT_FOUND).send({ message: "Duplicate key error: " });
       }
       return res.status(DEFAULT).send({ message: "Internal Server Error: " });
     });
@@ -39,27 +39,40 @@ const getItems = (req, res) => {
     });
 };
 
+// const deleteItem = (req, res) => {
+//   const { itemId } = req.params;
+//   ClothingItem.findByIdAndRemove(itemId)
+//     .orFail()
+//     .then(() =>
+//       res.status(OKAY_REQUEST).send({ message: "Item has been deleted" })
+//     )
+//     .catch((err) => {
+//       console.error(err);
+//       if (err.name === "CastError") {
+//         return res.status(BAD_REQUEST).send({ message: "Invalid item ID" });
+//       }
+//       if (err.name === "DocumentNotFoundError") {
+//         return res.status(NOT_FOUND).send({ message: "Item not found" });
+//       }
+//       return res
+//         .status(DEFAULT)
+//         .send({ message: "An unexpected error occurred" });
+//     });
+// };
 const deleteItem = (req, res) => {
-  const { itemId } = req.params;
-  ClothingItem.findByIdAndRemove(itemId)
+  const { itemId } = req.parms;
+  ClothingItem.findById(itemId)
     .orFail()
-    .then(() =>
-      res.status(OKAY_REQUEST).send({ message: "Item has been deleted" })
-    )
-    .catch((err) => {
-      console.error(err);
-      if (err.name === "CastError") {
-        return res.status(BAD_REQUEST).send({ message: "Invalid item ID" });
+    .then((item) => {
+      if (String(item.owner) !== req.user._id) {
+        return res
+          .status(NOT_AUTHORIZED)
+          .send({ message: "You are not authorized to delete this" });
       }
-      if (err.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND).send({ message: "Item not found" });
-      }
-      return res
-        .status(DEFAULT)
-        .send({ message: "An unexpected error occurred" });
-    });
+      return item.deleteOne().then(() => res.send({ message: "Item deleted" }));
+    })
+    .catch((e) => itemError(req, res, e));
 };
-
 const likeItem = (req, res) => {
   const { itemId } = req.params;
   ClothingItem.findByIdAndUpdate(
