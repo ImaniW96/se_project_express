@@ -10,6 +10,6 @@ router.use("/users", userRouter);
 router.use("/items", clothingItemRouter);
 
 router.use((req, res) =>
-  res.status(NOT_FOUND).send({ message: "Route not fuond" })
+  res.status(NOT_FOUND).send({ message: "Route not found" })
 );
 module.exports = router;

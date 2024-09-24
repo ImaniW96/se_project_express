@@ -11,7 +11,7 @@ const {
   NOT_AUTHORIZED,
 } = require("../utils/errors");
 
-const JWT_SECRET = "some-secret-key";
+const { JWT_SECRET = "some-secret-key" } = process.env;
 
 // This can become getCurrentUser
 // instead of getting ID from params
