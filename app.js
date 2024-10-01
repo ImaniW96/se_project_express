@@ -1,9 +1,11 @@
+const validateUserBody = require("./middlewares/validation");
+const validateAuthentication = require("./middlewares/validation");
+require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const mainRouter = require("./routes/index");
 const { logIn, createUser } = require("./controllers/users");
-require("dotenv").config();
 const app = express();
 const { PORT = 3001 } = process.env;
 mongoose
@@ -20,8 +22,8 @@ app.get("/crash-test", () => {
     throw new Error("Server will crash now");
   }, 0);
 });
-app.post("/signin", logIn);
-app.post("/signup", createUser);
+app.post("/signin", validateAuthentication, logIn);
+app.post("/signup", validateUserBody, createUser);
 
 app.use("/", mainRouter);
 

@@ -3,7 +3,6 @@ const {
   NOT_FOUND,
   OKAY_REQUEST,
   CREATE_REQUEST,
-  // NOT_AUTHORIZED,
   FORBIDDEN_ERROR,
 } = require("../utils/errors");
 const { BAD_REQUEST, DEFAULT } = require("./users");
@@ -40,26 +39,6 @@ const getItems = (req, res) => {
     });
 };
 
-// const deleteItem = (req, res) => {
-//   const { itemId } = req.params;
-//   ClothingItem.findByIdAndRemove(itemId)
-//     .orFail()
-//     .then(() =>
-//       res.status(OKAY_REQUEST).send({ message: "Item has been deleted" })
-//     )
-//     .catch((err) => {
-//       console.error(err);
-//       if (err.name === "CastError") {
-//         return res.status(BAD_REQUEST).send({ message: "Invalid item ID" });
-//       }
-//       if (err.name === "DocumentNotFoundError") {
-//         return res.status(NOT_FOUND).send({ message: "Item not found" });
-//       }
-//       return res
-//         .status(DEFAULT)
-//         .send({ message: "An unexpected error occurred" });
-//     });
-// };
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
   ClothingItem.findById(itemId)
@@ -124,19 +103,6 @@ const deleteLike = (req, res) => {
       }
       return res.status(DEFAULT).send({ message: err.message });
     });
-  //   const userSchema = new Schema({
 
-  //     password: {
-  //       type: String,
-  //       required: true,
-  //       select: false
-  //     },
-
-  //   })
+  module.exports = { getItems, createItem, deleteItem, likeItem, deleteLike };
 };
-
-// const mongoose = require("mongoose");
-
-// const clothingItemSchema = new mongoose.Schema({});
-
-module.exports = { getItems, createItem, deleteItem, likeItem, deleteLike };

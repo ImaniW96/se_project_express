@@ -1,3 +1,4 @@
+const JWT_SECRET = require("../utils/config");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
@@ -10,8 +11,6 @@ const {
   DUPLICATE_ERROR,
   NOT_AUTHORIZED,
 } = require("../utils/errors");
-
-const { JWT_SECRET = "some-secret-key" } = process.env;
 
 // This can become getCurrentUser
 // instead of getting ID from params

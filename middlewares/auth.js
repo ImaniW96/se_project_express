@@ -1,5 +1,4 @@
-// middlewares/auth.js
-
+const JWT_SECRET = require("../utils/config");
 const jwt = require("jsonwebtoken");
 const { NOT_AUTHORIZED } = require("../utils/errors");
 
@@ -15,7 +14,7 @@ module.exports = (req, res, next) => {
 
   try {
     // trying to verify the token
-    payload = jwt.verify(token, "some-secret-key");
+    payload = jwt.verify(token, JWT_SECRET);
   } catch (err) {
     // we return an error if something goes wrong
     return res
