@@ -1,5 +1,8 @@
-const validateUserBody = require("./middlewares/validation");
-const validateAuthentication = require("./middlewares/validation");
+const {
+  validateUserBody,
+  validateAuthentication,
+} = require("./middlewares/validation");
+
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
