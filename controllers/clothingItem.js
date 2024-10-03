@@ -1,3 +1,4 @@
+const Error = require("../utils/errors");
 const ClothingItem = require("../models/clothingItem");
 const {
   NOT_FOUND,
@@ -49,6 +50,7 @@ const deleteItem = (req, res) => {
           .status(FORBIDDEN_ERROR)
           .send({ message: "You are not authorized to delete this" });
       }
+      next(new Error.ForbiddenError("You are not allowed to delete this"));
       return item.deleteOne().then(() => res.send({ message: "Item deleted" }));
     })
     .catch((err) => {

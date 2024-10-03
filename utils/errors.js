@@ -15,7 +15,7 @@ class BadRequestError extends Error {
     this.statusCode = 400;
   }
 }
-class FrobiddenError extends Error {
+class ForbiddenError extends Error {
   constructor(message) {
     super(message);
     this.statusCode = 403;
@@ -59,7 +59,7 @@ class DuplicateError extends Error {
 }
 module.exports = {
   BadRequestError,
-  FrobiddenError,
+  ForbiddenError,
   NotFound,
   Default,
   NotAuthorized,
