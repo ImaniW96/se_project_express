@@ -103,6 +103,5 @@ const deleteLike = (req, res) => {
       }
       return res.status(DEFAULT).send({ message: err.message });
     });
-
-  module.exports = { getItems, createItem, deleteItem, likeItem, deleteLike };
 };
+module.exports = { getItems, createItem, deleteItem, likeItem, deleteLike };
