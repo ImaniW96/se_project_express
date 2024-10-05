@@ -12,9 +12,7 @@ const { BAD_REQUEST, DEFAULT } = require("./users");
 const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
   if (!name || name.length < 2) {
-    return res.status(BAD_REQUEST).send({
-      message: "The 'name' field must be at least 2 characters long.",
-    });
+    return handleErrors(err, next);
   }
   return ClothingItem.create({
     name,
@@ -43,9 +41,7 @@ const deleteItem = (req, res, next) => {
     .orFail()
     .then((item) => {
       if (String(item.owner) !== req.user._id) {
-        return res
-          .status(FORBIDDEN_ERROR)
-          .send({ message: "You are not authorized to delete this" });
+        return handleErrors(err, next);
       }
       next(new Error.ForbiddenError("You are not allowed to delete this"));
       return item.deleteOne().then(() => res.send({ message: "Item deleted" }));

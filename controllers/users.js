@@ -71,7 +71,7 @@ const logIn = (req, res, next) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    handleErrors(error, next);
+    handleErrors(err, next);
   }
 
   User.findOne({ email })
@@ -81,13 +81,14 @@ const logIn = (req, res, next) => {
         // return res
         //   .status(NOT_AUTHORIZED)
         //   .send({ message: "Please enter a valid email or password" });
-        handleErrors(error, next);
+        handleErrors(err, next);
       }
       return bcrypt.compare(password, user.password).then((isMatch) => {
         if (!isMatch) {
-          const error = new Error();
-          error.name = "NotAuthorizedError";
-          throw error;
+          // const error = new Error();
+          // error.name = "NotAuthorizedError";
+          // throw error;
+          handleErrors(err, next);
         }
 
         const token = jwt.sign({ _id: user._id }, JWT_SECRET, {

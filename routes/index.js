@@ -10,8 +10,6 @@ router.use("/users", userRouter);
 router.use("/items", clothingItemRouter);
 
 router.use((req, res, next) => {
-  const error = new error();
-  error.name = "DocumentNotFoundError";
   handleErrors(error, next);
 });
 // throw new NotFound("Route not found");
