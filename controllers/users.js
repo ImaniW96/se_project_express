@@ -10,12 +10,14 @@ const {
   NOT_FOUND,
   DUPLICATE_ERROR,
   NOT_AUTHORIZED,
+  handleErrors,
 } = require("../utils/errors");
+const { error } = require("winston");
 
 // This can become getCurrentUser
 // instead of getting ID from params
 // you get from req.user
-const getCurrentUser = (req, res) => {
+const getCurrentUser = (req, res, next) => {
   const userId = req.user._id;
   console.log(userId);
 
@@ -24,16 +26,17 @@ const getCurrentUser = (req, res) => {
     .then((user) => res.status(OKAY_REQUEST).send(user))
     .catch((err) => {
       console.error(err);
-      if (err.name === "ValidationError" || err.name === "CastError") {
-        return res.status(BAD_REQUEST).send({ message: err.message });
-      }
-      if (err.name === "DocumentNotFoundError") {
-        return res.status(NOT_FOUND).send({ message: err.message });
-      }
-      return res.status(DEFAULT).send({ message: err.message });
+      // if (err.name === "ValidationError" || err.name === "CastError") {
+      //   return res.status(BAD_REQUEST).send({ message: err.message });
+      // }
+      // if (err.name === "DocumentNotFoundError") {
+      //   return res.status(NOT_FOUND).send({ message: err.message });
+      // }
+      // return res.status(DEFAULT).send({ message: err.message });
+      handleErrors(err, next);
     });
 };
-const createUser = (req, res) => {
+const createUser = (req, res, next) => {
   const { name, avatar, email, password } = req.body;
 
   bcrypt
@@ -53,38 +56,38 @@ const createUser = (req, res) => {
         email: user.email,
       })
     )
-    .catch((err) => {
-      if (err.code === 11000) {
-        return res.status(DUPLICATE_ERROR).send({ message: "Duplicate error" });
-      }
-      if (err.name === "ValidationError") {
-        return res.status(BAD_REQUEST).send({ message: "Invalid data" });
-      }
-      return res.status(DEFAULT).send({ message: "An error has occured" });
+    .catch((error) => {
+      handleErrors(error, next);
+      // if (err.code === 11000) {
+      //   return res.status(DUPLICATE_ERROR).send({ message: "Duplicate error" });
+      // }
+      // if (err.name === "ValidationError") {
+      //   return res.status(BAD_REQUEST).send({ message: "Invalid data" });
+      // }
+      // return res.status(DEFAULT).send({ message: "An error has occured" });
     });
 };
-const logIn = (req, res) => {
+const logIn = (req, res, next) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    return res
-      .status(BAD_REQUEST)
-      .send({ message: "email and password are required" });
+    handleErrors(error, next);
   }
 
   User.findOne({ email })
     .select("+password")
     .then((user) => {
       if (!user) {
-        return res
-          .status(NOT_AUTHORIZED)
-          .send({ message: "Please enter a valid email or password" });
+        // return res
+        //   .status(NOT_AUTHORIZED)
+        //   .send({ message: "Please enter a valid email or password" });
+        handleErrors(error, next);
       }
       return bcrypt.compare(password, user.password).then((isMatch) => {
         if (!isMatch) {
-          return res
-            .status(NOT_AUTHORIZED)
-            .send({ message: "Invalid email or password" });
+          const error = new Error();
+          error.name = "NotAuthorizedError";
+          throw error;
         }
 
         const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
@@ -100,9 +103,9 @@ const logIn = (req, res) => {
         });
       });
     })
-    .catch(() => res.status(DEFAULT).send({ message: "failed to log in" }));
+    .catch((err) => handleErrors(err, next));
 };
-const updateUser = (req, res) => {
+const updateUser = (req, res, next) => {
   User.findByIdAndUpdate(
     req.user._id,
     { name: req.body.name, avatar: req.body.avatar },
@@ -116,10 +119,7 @@ const updateUser = (req, res) => {
     .then((user) => res.send({ data: user }))
     .catch((e) => {
       console.error(e.name);
-      if (e.name === "ValidationError") {
-        return res.status(BAD_REQUEST).send({ message: "Validation error: " });
-      }
-      return res.status(DEFAULT).send({ message: "Internal Server Error: " });
+      handleErrors(error, next);
     });
 };
 

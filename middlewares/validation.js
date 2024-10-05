@@ -29,7 +29,7 @@ const validateUserBody = celebrate({
       "string.empty": 'The "name" field must be filled in',
     }),
 
-    avatarUrl: Joi.string().required().custom(validateURL).messages({
+    avatar: Joi.string().required().custom(validateURL).messages({
       "string.empty": 'The "avatarUrl" field must be filled in',
       "string.uri": 'the "avatarUrl" field must be a valid url',
     }),
@@ -59,4 +59,14 @@ const validateAuthentication = celebrate({
     }),
   }),
 });
-module.exports = { validateAuthentication, validateUserBody, validateCardBody };
+const validateId = celebrate({
+  params: Joi.object().keys({
+    itemId: Joi.string().alphanum().length(24),
+  }),
+});
+module.exports = {
+  validateAuthentication,
+  validateUserBody,
+  validateId,
+  validateCardBody,
+};
