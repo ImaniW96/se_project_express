@@ -12,7 +12,7 @@ const { BAD_REQUEST, DEFAULT } = require("./users");
 const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
   if (!name || name.length < 2) {
-    return handleErrors(err, next);
+    next(new BadRequestError());
   }
   return ClothingItem.create({
     name,

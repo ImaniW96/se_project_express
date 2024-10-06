@@ -40,12 +40,12 @@
 //     this.statusCode = 201;
 //   }
 // }
-class DuplicateError extends Error {
-  constructor(message) {
-    super(message);
-    this.statusCode = 409;
-  }
-}
+// class DuplicateError extends Error {
+//   constructor(message) {
+//     super(message);
+//     this.statusCode = 409;
+//   }
+// }
 
 function handleErrors(err, next) {
   console.error(err);
