@@ -31,7 +31,7 @@ const getItems = (req, res) => {
     .then((items) => res.status(OKAY_REQUEST).send(items))
     .catch((e) => {
       console.error(e);
-      res.status(DEFAULT).send({ message: "Error can not getItems" });
+      handleErrors(err, next);
     });
 };
 
@@ -42,8 +42,8 @@ const deleteItem = (req, res, next) => {
     .then((item) => {
       if (String(item.owner) !== req.user._id) {
         return handleErrors(err, next);
+        // next(new Error.ForbiddenError("You are not allowed to delete this"));
       }
-      next(new Error.ForbiddenError("You are not allowed to delete this"));
       return item.deleteOne().then(() => res.send({ message: "Item deleted" }));
     })
     .catch((err) => {

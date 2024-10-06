@@ -1,33 +1,33 @@
-class BadRequestError extends Error {
-  constructor(message) {
-    super(message);
-    this.statusCode = 400;
-  }
-}
-class ForbiddenError extends Error {
-  constructor(message) {
-    super(message);
-    this.statusCode = 403;
-  }
-}
-class NotFound extends Error {
-  constructor(message) {
-    super(message);
-    this.statusCode = 404;
-  }
-}
-class Default extends Error {
-  constructor(message) {
-    super(message);
-    this.statusCode = 500;
-  }
-}
-class NotAuthorized extends Error {
-  constructor(message) {
-    super(message);
-    this.statusCode = 401;
-  }
-}
+// class BadRequestError extends Error {
+//   constructor(message) {
+//     super(message);
+//     this.statusCode = 400;
+//   }
+// }
+// class ForbiddenError extends Error {
+//   constructor(message) {
+//     super(message);
+//     this.statusCode = 403;
+//   }
+// }
+// class NotFound extends Error {
+//   constructor(message) {
+//     super(message);
+//     this.statusCode = 404;
+//   }
+// }
+// class Default extends Error {
+//   constructor(message) {
+//     super(message);
+//     this.statusCode = 500;
+//   }
+// }
+// class NotAuthorized extends Error {
+//   constructor(message) {
+//     super(message);
+//     this.statusCode = 401;
+//   }
+// }
 // class OkayRequest extends Error {
 //   constructor(message) {
 //     super(message);
