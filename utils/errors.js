@@ -33,7 +33,6 @@ module.exports = {
   Default,
   NotAuthorized,
   handleErrors,
-
   DuplicateError,
   BAD_REQUEST: 400,
   FORBIDDEN_ERROR: 403,

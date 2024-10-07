@@ -1,16 +1,12 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const { error } = require("winston");
 const JWT_SECRET = require("../utils/config");
 const User = require("../models/user");
+const BadRequestError = require("../errors/BadRequstError");
+const NotAuthorized = require("../errors/NotAuthorized");
 const {
-  BAD_REQUEST,
-  DEFAULT,
   OKAY_REQUEST,
   CREATE_REQUEST,
-  NOT_FOUND,
-  DUPLICATE_ERROR,
-  NOT_AUTHORIZED,
   handleErrors,
 } = require("../utils/errors");
 
@@ -19,8 +15,6 @@ const {
 // you get from req.user
 const getCurrentUser = (req, res, next) => {
   const userId = req.user._id;
-  console.log(userId);
-
   User.findById(userId)
     .orFail()
     .then((user) => res.status(OKAY_REQUEST).send(user))
@@ -58,13 +52,6 @@ const createUser = (req, res, next) => {
     )
     .catch((error) => {
       handleErrors(error, next);
-      // if (err.code === 11000) {
-      //   return res.status(DUPLICATE_ERROR).send({ message: "Duplicate error" });
-      // }
-      // if (err.name === "ValidationError") {
-      //   return res.status(BAD_REQUEST).send({ message: "Invalid data" });
-      // }
-      // return res.status(DEFAULT).send({ message: "An error has occured" });
     });
 };
 const logIn = (req, res, next) => {
@@ -78,17 +65,10 @@ const logIn = (req, res, next) => {
     .select("+password")
     .then((user) => {
       if (!user) {
-        // return res
-        //   .status(NOT_AUTHORIZED)
-        //   .send({ message: "Please enter a valid email or password" });
         throw new NotAuthorized("NotAuthorizedError");
       }
       return bcrypt.compare(password, user.password).then((isMatch) => {
         if (!isMatch) {
-          // const error = new Error();
-          // error.name = "NotAuthorizedError";
-          // throw error;
-          // handleErrors(err, next);
           throw new NotAuthorized("NotAuthorizedError");
         }
 
@@ -119,23 +99,17 @@ const updateUser = (req, res, next) => {
     }
   )
     .then((user) => res.send({ data: user }))
-    .catch((e) => {
-      console.error(e.name);
+    .catch((error) => {
+      console.error(error.name);
       handleErrors(error, next);
     });
 };
 
 module.exports = {
-  // getUsers,
   createUser,
   getCurrentUser,
   logIn,
   updateUser,
-  BAD_REQUEST,
-  DEFAULT,
-  OKAY_REQUEST,
-  CREATE_REQUEST,
-  NOT_FOUND,
 };
 
 // when a user signs up on the frontend we fetch to the backend:

@@ -1,25 +1,24 @@
-const { requestLogger, errorLogger } = require("./middlewares/logger");
 require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
-// const { celebrate } = require("celebrate");
+
 const cors = require("cors");
+
+const app = express();
+const { PORT = 3001 } = process.env;
+const { errors } = require("celebrate");
+const { requestLogger, errorLogger } = require("./middlewares/logger");
 const {
   validateUserBody,
   validateAuthentication,
 } = require("./middlewares/validation");
 
-const app = express();
-const { PORT = 3001 } = process.env;
-const { errors } = require("celebrate");
 const { logIn, createUser } = require("./controllers/users");
 const mainRouter = require("./routes/index");
 
 mongoose
   .connect("mongodb://127.0.0.1:27017/wtwr_db")
-  .then(() => {
-    console.log("Connected to DB");
-  })
+  .then(() => {})
   .catch(console.error);
 app.use(express.json());
 app.use(requestLogger);
@@ -46,6 +45,4 @@ app.use((error, req, res) =>
 
 // 1. this should go in routes/users.js
 
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
+app.listen(PORT, () => {});

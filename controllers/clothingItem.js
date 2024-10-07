@@ -1,18 +1,14 @@
-const Error = require("../utils/errors");
 const ClothingItem = require("../models/clothingItem");
 const { handleErrors } = require("../utils/errors");
-const {
-  NOT_FOUND,
-  OKAY_REQUEST,
-  CREATE_REQUEST,
-  FORBIDDEN_ERROR,
-} = require("../utils/errors");
-const { BAD_REQUEST, DEFAULT } = require("./users");
+const { OKAY_REQUEST, CREATE_REQUEST } = require("../utils/errors");
+const { DEFAULT } = require("./users");
+const BadRequestError = require("../errors/BadRequstError");
+const ForbiddenError = require("../errors/ForbiddenError");
 
 const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
   if (!name || name.length < 2) {
-    new BadRequestError("Invalid data");
+    throw new BadRequestError("Invalid data");
   }
   return ClothingItem.create({
     name,
@@ -26,7 +22,7 @@ const createItem = (req, res, next) => {
     });
 };
 
-const getItems = (req, res) => {
+const getItems = (req, res, next) => {
   ClothingItem.find({})
     .then((items) => res.status(OKAY_REQUEST).send(items))
     .catch((e) => {
@@ -77,7 +73,7 @@ const deleteLike = (req, res) => {
     .orFail()
     .then((item) => res.status(OKAY_REQUEST).send(item))
     .catch((err) => {
-      handleErrors(res, next);
+      handleErrors(err, next);
     });
 };
 

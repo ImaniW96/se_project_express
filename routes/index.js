@@ -1,7 +1,6 @@
-import { NotFound } from "../errors/NotFound";
-
 const router = require("express").Router();
 const userRouter = require("./users");
+const NotFound = require("../errors/NotFound");
 // const logIn = require("./users");
 const clothingItemRouter = require("./clothingItems");
 // const { NOT_FOUND, handleErrors } = require("../utils/errors");
@@ -10,7 +9,7 @@ const clothingItemRouter = require("./clothingItems");
 router.use("/users", userRouter);
 router.use("/items", clothingItemRouter);
 
-router.use((req, res, next) => {
+router.use(() => {
   throw new NotFound("Route not found");
 });
 // throw new NotFound("Route not found");
