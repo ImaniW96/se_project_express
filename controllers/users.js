@@ -1,6 +1,7 @@
-const JWT_SECRET = require("../utils/config");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const { error } = require("winston");
+const JWT_SECRET = require("../utils/config");
 const User = require("../models/user");
 const {
   BAD_REQUEST,
@@ -12,7 +13,6 @@ const {
   NOT_AUTHORIZED,
   handleErrors,
 } = require("../utils/errors");
-const { error } = require("winston");
 
 // This can become getCurrentUser
 // instead of getting ID from params
@@ -71,7 +71,7 @@ const logIn = (req, res, next) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
-    handleErrors(err, next);
+    throw new BadRequestError("Invalid data");
   }
 
   User.findOne({ email })
@@ -81,14 +81,15 @@ const logIn = (req, res, next) => {
         // return res
         //   .status(NOT_AUTHORIZED)
         //   .send({ message: "Please enter a valid email or password" });
-        handleErrors(err, next);
+        throw new NotAuthorized("NotAuthorizedError");
       }
       return bcrypt.compare(password, user.password).then((isMatch) => {
         if (!isMatch) {
           // const error = new Error();
           // error.name = "NotAuthorizedError";
           // throw error;
-          handleErrors(err, next);
+          // handleErrors(err, next);
+          throw new NotAuthorized("NotAuthorizedError");
         }
 
         const token = jwt.sign({ _id: user._id }, JWT_SECRET, {

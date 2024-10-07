@@ -1,3 +1,10 @@
+import { BadRequestError } from "../errors/BadRequstError";
+import { NotFound } from "../errors/NotFound";
+import { DuplicateError } from "../errors/DuplicateError";
+import { Default } from "../errors/Default";
+import { NotAuthorized } from "../errors/NotAuthorized";
+import { ForbiddenError } from "../errors/ForbiddenError";
+
 function handleErrors(err, next) {
   console.error(err);
   if (err.name === "ValidationError" || err.name === "CastError") {
@@ -12,7 +19,7 @@ function handleErrors(err, next) {
     // return res.status(DUPLICATE_ERROR).send({ message: "Duplicate error" });
     return next(new DuplicateError("Duplicate Error"));
   }
-  if (err.name === "NotAuthorizedError") {
+  if (err.statusCode === 401) {
     return next(new NotAuthorized("Not Authorized Error"));
   }
   // return res.status(DEFAULT).send({ message: err.message });

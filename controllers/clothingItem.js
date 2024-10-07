@@ -1,6 +1,6 @@
 const Error = require("../utils/errors");
 const ClothingItem = require("../models/clothingItem");
-const handleErrors = require("../utils/errors");
+const { handleErrors } = require("../utils/errors");
 const {
   NOT_FOUND,
   OKAY_REQUEST,
@@ -12,7 +12,7 @@ const { BAD_REQUEST, DEFAULT } = require("./users");
 const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
   if (!name || name.length < 2) {
-    next(new BadRequestError());
+    new BadRequestError("Invalid data");
   }
   return ClothingItem.create({
     name,
@@ -31,7 +31,7 @@ const getItems = (req, res) => {
     .then((items) => res.status(OKAY_REQUEST).send(items))
     .catch((e) => {
       console.error(e);
-      handleErrors(err, next);
+      return next(new DEFAULT("server error"));
     });
 };
 
@@ -41,8 +41,7 @@ const deleteItem = (req, res, next) => {
     .orFail()
     .then((item) => {
       if (String(item.owner) !== req.user._id) {
-        return handleErrors(err, next);
-        // next(new Error.ForbiddenError("You are not allowed to delete this"));
+        return next(new ForbiddenError("You are not allowed to delete this"));
       }
       return item.deleteOne().then(() => res.send({ message: "Item deleted" }));
     })
