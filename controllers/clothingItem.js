@@ -3,7 +3,7 @@ const { handleErrors } = require("../utils/errors");
 const { OKAY_REQUEST, CREATE_REQUEST } = require("../utils/errors");
 const { DEFAULT } = require("./users");
 const BadRequestError = require("../errors/BadRequstError");
-const ForbiddenError = require("../errors/ForbiddenError");
+const { ForbiddenError } = require("../errors/ForbiddenError");
 
 const createItem = (req, res, next) => {
   const { name, weather, imageUrl } = req.body;
@@ -45,7 +45,7 @@ const deleteItem = (req, res, next) => {
       handleErrors(err, next);
     });
 };
-const likeItem = (req, res) => {
+const likeItem = (req, res, next) => {
   const { itemId } = req.params;
   ClothingItem.findByIdAndUpdate(
     itemId,
@@ -61,7 +61,7 @@ const likeItem = (req, res) => {
     });
 };
 
-const deleteLike = (req, res) => {
+const deleteLike = (req, res, next) => {
   const { itemId } = req.params;
   ClothingItem.findByIdAndUpdate(
     itemId,

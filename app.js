@@ -39,9 +39,10 @@ app.use(errorLogger); // enabling the error logger
 
 app.use(errors()); // celebrate error handler
 // app.use(errorHandler);
-app.use((error, req, res) =>
-  res.status(error.statusCode).send({ message: error.message })
-);
+app.use((error, req, res, next) => {
+  res.status(error.statusCode).send({ message: error.message });
+  next();
+});
 
 // 1. this should go in routes/users.js
 

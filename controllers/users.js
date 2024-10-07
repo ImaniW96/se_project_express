@@ -2,8 +2,8 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const JWT_SECRET = require("../utils/config");
 const User = require("../models/user");
-const BadRequestError = require("../errors/BadRequstError");
-const NotAuthorized = require("../errors/NotAuthorized");
+const { BadRequestError } = require("../errors/BadRequstError");
+const { NotAuthorized } = require("../errors/NotAuthorized");
 const {
   OKAY_REQUEST,
   CREATE_REQUEST,
@@ -20,13 +20,7 @@ const getCurrentUser = (req, res, next) => {
     .then((user) => res.status(OKAY_REQUEST).send(user))
     .catch((err) => {
       console.error(err);
-      // if (err.name === "ValidationError" || err.name === "CastError") {
-      //   return res.status(BAD_REQUEST).send({ message: err.message });
-      // }
-      // if (err.name === "DocumentNotFoundError") {
-      //   return res.status(NOT_FOUND).send({ message: err.message });
-      // }
-      // return res.status(DEFAULT).send({ message: err.message });
+
       handleErrors(err, next);
     });
 };
